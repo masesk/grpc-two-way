@@ -2,9 +2,9 @@
 
 ## Concept
 
-In a two-way grpc setup, the server acts, in a way, as the proxy to the clients.
+In a two-way grpc setup, the server acts, in a way, as the middleware to the clients.
 Each client connects to the server and provides to the server its own port number.
-The server number uses the client IP address and provided port number to connect to the client's own gRPC server.
+The server uses the client IP address and provided port number to connect to the client's own gRPC server.
 
 The server stores all of its clients in a list and upon a failure, assumes the client is down.
 It is up to the client to re-establish connection. The provided examples cover that as well.
