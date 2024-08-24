@@ -1,0 +1,30 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+package twoway;
+
+enum SubscriptionStatus {
+  Success = 0;
+  Failure = 1;
+}
+
+service TwoWay {
+  rpc Connect(Subscription) returns (SubscriptionResponse) {}
+  rpc Chat(Message) returns (google.protobuf.Empty) {}
+}
+
+message Subscription  {
+  optional string address = 1;
+  string port = 2;
+}
+
+message SubscriptionResponse {
+    SubscriptionStatus status = 1;
+}
+
+message Message {
+  string user = 1;
+  string message = 2;
+}
+
+
