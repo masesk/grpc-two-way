@@ -76,7 +76,6 @@ public:
           // if we were ready and now we are not (failed or idle), we have a problem
           if (state == GRPC_CHANNEL_READY){
               Subscription request;
-              request.set_address("127.0.0.1");
               request.set_port(std::to_string(this->port));
               SubscriptionResponse reply;
               grpc::ClientContext context;
