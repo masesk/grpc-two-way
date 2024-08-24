@@ -4,6 +4,7 @@
 #include <sstream>
 #include <list>
 #include <memory>
+#include <vector>
 #include <grpcpp/grpcpp.h>
 #include <grpc/grpc.h>
 #include <grpcpp/security/server_credentials.h>
@@ -27,7 +28,7 @@ class TwoWayClient
 {
 public:
   TwoWayClient(const std::string &address, std::mutex &mutex, std::list<TwoWayClient *> &clients)
-  : mutex_(mutex), clients_(clients)
+      : mutex_(mutex), clients_(clients)
   {
     channel_ = grpc::CreateChannel(address, grpc::InsecureChannelCredentials());
     stub_ = TwoWay::NewStub(channel_);
@@ -86,7 +87,10 @@ public:
     }
     else
     {
-      address_stream << context->peer();
+      
+      std::vector<std::string> tokens = this->split(context->peer(), ":");
+      if(tokens.size() != 3) return Status::CANCELLED;
+      address_stream << tokens[1];
     }
     address_stream << ":" << request->port();
     TwoWayClient *newClient = new TwoWayClient(address_stream.str(), mutex, clients);
@@ -98,14 +102,16 @@ public:
   {
     std::unique_lock<std::mutex> lock(mutex);
     std::list<TwoWayClient *>::iterator it = clients.begin();
-    while(it != clients.end())
+    while (it != clients.end())
     {
 
-      if((*it)->SendMessage(*request)){
-        
+      if ((*it)->SendMessage(*request))
+      {
+
         ++it;
       }
-      else{
+      else
+      {
         delete (*it);
         it = clients.erase(it);
       }
@@ -114,6 +120,23 @@ public:
   }
 
 private:
+  // for string delimiter
+  std::vector<std::string> split(std::string s, std::string delimiter)
+  {
+    size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+    std::string token;
+    std::vector<std::string> res;
+
+    while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos)
+    {
+      token = s.substr(pos_start, pos_end - pos_start);
+      pos_start = pos_end + delim_len;
+      res.push_back(token);
+    }
+
+    res.push_back(s.substr(pos_start));
+    return res;
+  }
   std::list<TwoWayClient *> clients;
   std::mutex mutex;
 };
