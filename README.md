@@ -65,14 +65,14 @@ make -j 4
 build/chat_server
 ```
 
-2. Run Client 1
+2. Run Client 1 (5558 is the port the client 2 will bind)
 ```
-build/chat_client
+build/chat_client 5558
 ```
 
-3. Run client 2
+3. Run client 2 (778 is the port the client 2 will bind)
 ```
-build/chat_client
+build/chat_client 7778
 ```
 
 For each client, input a username and press enter.
